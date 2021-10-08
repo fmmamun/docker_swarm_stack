@@ -8,7 +8,7 @@ services:
     # Command used to deploy the Service
     deploy:
       # Run 5 instances of that image as a service called web
-      replicas: 6
+      replicas: 4
       resources:
         # Limiting each one to use, at most, 10% of a single core of CPU time and 50MB of RAM.
         limits:
@@ -31,8 +31,20 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     deploy:
       placement:
-        constraints: [node.role == manager]
+        constraints: [node.hostname == ip-192-168-1-4]
     networks:
+      - webnet
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./data:/data"
+    deploy:
+      placement:
+        constraints: [node.hostname == ip-192-168-1-4]
+    command: redis-server --appendonly yes
+    networks: 
       - webnet
 networks:
   webnet:
